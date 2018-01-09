@@ -26,6 +26,21 @@ experiment file:
 
 ```json
 {
+    "type": "action",
+    "name": "terminate-random-instance",
+    "provider": {
+        "type": "python",
+        "module": "chaoscf.probes",
+        "func": "terminate_some_random_instance",
+        "arguments": {
+            "name": "my-app",
+            "org_name": "my-org",
+            "space_name": "my-space"
+        }
+    }
+},
+{
+    "type": "probe",
     "name": "fetch-app-statistics",
     "provider": {
         "type": "python",
@@ -54,7 +69,7 @@ file:
 {
     "configuration": {
         "cf_api_url": "https://api.local.pcfdev.io",
-        "cf_verifiy_ssl": false
+        "cf_verify_ssl": false
     },
     "secrets": {
         "cloudfoundry": {
@@ -79,6 +94,7 @@ Then in your probe or action:
 
 ```json
 {
+    "type": "probe",
     "name": "fetch-app-statistics",
     "provider": {
         "type": "python",
