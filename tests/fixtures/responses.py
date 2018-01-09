@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
-from typing import Callable, NamedTuple
+from typing import Any, Callable
 
-class FakeResponse(NamedTuple):
-    status_code: int = 200
-    text: str = None
-    json: Callable[[], str] = None
+
+class FakeResponse:
+    def __init__(self, status_code: int = 200, text: str = None,
+                 json: Any = None):
+        self.status_code = status_code
+        self.text = text
+        self.json = json
+
 
 space_name = "my-space"
 org_name = "my-org"
