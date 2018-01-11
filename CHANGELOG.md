@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.2.1...HEAD
+
+## [0.2.1][]
+
+[0.2.1]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.2.0...0.2.1
+
+### Added
+
+-   requirements-dev.txt to MANIFEST.in
 
 ## [0.2.0][]
 
