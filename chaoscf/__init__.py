@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
-from typing import Any, Dict
+import json
+import os
+import os.path
+from typing import Any, Dict, List
 
+from chaoslib.discovery.discover import discover_actions, discover_probes, \
+    initialize_discovery_result
 from chaoslib.exceptions import FailedActivity
-from chaoslib.types import Configuration, Secrets
+from chaoslib.types import Configuration, Discovery, DiscoveredActivities, \
+    DiscoveredSystemInfo, Secrets
 from logzero import logger
 from oauthlib.oauth2 import LegacyApplicationClient
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
@@ -12,8 +18,8 @@ import urllib3
 
 urllib3.disable_warnings()
 
-__version__ = '0.2.1'
-__all__ = ["__version__", "auth"]
+__version__ = '0.3.0'
+__all__ = ["__version__", "auth", "discover"]
 
 
 def auth(configuration: Configuration, secrets: Secrets) -> Dict[str, str]:
@@ -36,6 +42,7 @@ def auth(configuration: Configuration, secrets: Secrets) -> Dict[str, str]:
     Returns a mapping with the `access_token` and `refresh_token` keys as per
     http://docs.cloudfoundry.org/api/uaa/version/4.8.0/index.html#password-grant
     """
+
     api_url = configuration.get("cf_api_url")
     verify_ssl = configuration.get("cf_verify_ssl", True)
 
@@ -44,6 +51,8 @@ def auth(configuration: Configuration, secrets: Secrets) -> Dict[str, str]:
     client_id = secrets.get("cf_client_id", "cf")
     client_secret = secrets.get("cf_client_secret", "")
 
+    logger.debug(
+        "Querying a new access token for client '{c}'".format(c=client_id))
     return get_tokens(api_url, username, password, client_id, client_secret,
                       verify_ssl)
 
@@ -78,3 +87,71 @@ def get_tokens(api_url: str, username: str, password: str,
                              "cannot proceed further")
 
     return r
+
+
+def discover(discover_system: bool = True) -> Discovery:
+    """
+    Discover Cloud Foundry capabilities from this extension as well, some
+    information about the Cloud Foundry cluster.
+    """
+    logger.info("Discovering capabilities from chaostoolkit-cloud-foundry")
+
+    discovery = initialize_discovery_result(
+        "chaostoolkit-cloud-foundry", __version__, "cloud-foundry")
+    discovery["activities"].extend(load_exported_activities())
+    if discover_system:
+        discovery["system"] = explore_cf_system()
+
+    return discovery
+
+
+###############################################################################
+# Private functions
+###############################################################################
+def load_exported_activities() -> List[DiscoveredActivities]:
+    """
+    Extract metadata from actions and probes exposed by this extension.
+    """
+    activities = []
+    activities.extend(discover_actions("chaoscf.actions"))
+    activities.extend(discover_probes("chaoscf.probes"))
+    return activities
+
+
+def explore_cf_system() -> DiscoveredSystemInfo:
+    """
+    Fetch information from the current Cloud Foundry context.
+    """
+    # importing here to avoid circular reference
+    from chaoscf.api import call_api
+
+    logger.info("Discovering Cloud Foundry system")
+    cf_local_config = os.path.expanduser("~/.cf/config.json")
+    if not os.path.exists(cf_local_config):
+        logger.warn(
+            "Could not locate a cloud coundry config file at '{s}'".format(
+                s=cf_local_config))
+        return
+
+    configuration = {}
+    with open(cf_local_config) as f:
+        cf_conf = json.loads(f.read())
+        if "AccessToken" not in cf_conf:
+            logger.warn(
+                "'{s}' is missing an access token, please run `cf login` "
+                "and re-run the discovery command".format(
+                    s=cf_local_config))
+            return
+
+        token_type, token = cf_conf["AccessToken"].split(" ", 1)
+        configuration["cf_token_type"] = token_type
+        configuration["cf_access_token"] = token
+        configuration["cf_verify_ssl"] = not cf_conf["SSLDisabled"]
+        configuration["cf_api_url"] = cf_conf["Target"]
+
+    info = {}
+    info["orgs"] = call_api("/v2/organizations", configuration).json()
+    info["apps"] = call_api("/v2/apps", configuration).json()
+    info["routes"] = call_api("/v2/routes", configuration).json()
+
+    return info
