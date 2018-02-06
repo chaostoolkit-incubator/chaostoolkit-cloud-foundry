@@ -59,6 +59,17 @@ That's it!
 
 Please explore the code to see existing probes and actions.
 
+### Discovery
+
+You may use the Chaos Toolkit to discover the capabilities of this extension:
+
+```
+$ chaos discover chaostoolkit-cloud-foundry --no-install
+```
+
+If you have logged in against a Cloud Foundry environment, this will discover
+information about it along the way.
+
 ## Configuration
 
 This extension to the Chaos Toolkit need credentials to a Cloud Foundry account
