@@ -18,7 +18,7 @@ import urllib3
 
 urllib3.disable_warnings()
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 __all__ = ["__version__", "auth", "discover"]
 
 
@@ -134,6 +134,7 @@ def explore_cf_system() -> DiscoveredSystemInfo:
         return
 
     configuration = {}
+    secrets = {}
     with open(cf_local_config) as f:
         cf_conf = json.loads(f.read())
         if "AccessToken" not in cf_conf:
@@ -144,14 +145,14 @@ def explore_cf_system() -> DiscoveredSystemInfo:
             return
 
         token_type, token = cf_conf["AccessToken"].split(" ", 1)
-        configuration["cf_token_type"] = token_type
-        configuration["cf_access_token"] = token
+        secrets["cf_token_type"] = token_type
+        secrets["cf_access_token"] = token
         configuration["cf_verify_ssl"] = not cf_conf["SSLDisabled"]
         configuration["cf_api_url"] = cf_conf["Target"]
 
     info = {}
-    info["orgs"] = call_api("/v2/organizations", configuration).json()
-    info["apps"] = call_api("/v2/apps", configuration).json()
-    info["routes"] = call_api("/v2/routes", configuration).json()
+    info["orgs"] = call_api("/v2/organizations", configuration, secrets).json()
+    info["apps"] = call_api("/v2/apps", configuration, secrets).json()
+    info["routes"] = call_api("/v2/routes", configuration, secrets).json()
 
     return info

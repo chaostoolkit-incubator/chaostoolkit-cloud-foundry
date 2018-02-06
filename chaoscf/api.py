@@ -14,19 +14,19 @@ __all__ = ['call_api', 'get_app_by_name', 'get_org_by_name',
 
 
 def call_api(path: str, configuration: Configuration,
-             secrets: Secrets = None, query: Dict[str, Any] = None,
+             secrets: Secrets, query: Dict[str, Any] = None,
              data: Dict[str, Any] = None, method: str = "GET",
              headers: Dict[str, str] = None) -> requests.Response:
     """
     Perform a Cloud Foundry API call and return the full response to the
     caller.
     """
-    if "cf_access_token" not in configuration:
+    if "cf_access_token" not in secrets:
         tokens = auth(configuration, secrets)
     else:
         tokens = {
-            "token_type": configuration.get("cf_token_type", "bearer"),
-            "access_token": configuration.get("cf_access_token")
+            "token_type": secrets.get("cf_token_type", "bearer"),
+            "access_token": secrets.get("cf_access_token")
         }
 
     h = {
