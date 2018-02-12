@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.3.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.4.0...HEAD
+
+## [0.4.0][]
+
+[0.4.0]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.3.1...0.4.0
+
+### Changed
+
+-   Do not discover system properties as it is not used by chaostoolkit anyway
 
 ## [0.3.1][]
 

@@ -8,7 +8,7 @@ from chaoslib.discovery.discover import discover_actions, discover_probes, \
     initialize_discovery_result
 from chaoslib.exceptions import FailedActivity
 from chaoslib.types import Configuration, Discovery, DiscoveredActivities, \
-    DiscoveredSystemInfo, Secrets
+    Secrets
 from logzero import logger
 from oauthlib.oauth2 import LegacyApplicationClient
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
@@ -18,7 +18,7 @@ import urllib3
 
 urllib3.disable_warnings()
 
-__version__ = '0.3.1'
+__version__ = '0.4.0'
 __all__ = ["__version__", "auth", "discover"]
 
 
@@ -91,17 +91,13 @@ def get_tokens(api_url: str, username: str, password: str,
 
 def discover(discover_system: bool = True) -> Discovery:
     """
-    Discover Cloud Foundry capabilities from this extension as well, some
-    information about the Cloud Foundry cluster.
+    Discover Cloud Foundry capabilities offered by this extension.
     """
     logger.info("Discovering capabilities from chaostoolkit-cloud-foundry")
 
     discovery = initialize_discovery_result(
         "chaostoolkit-cloud-foundry", __version__, "cloud-foundry")
     discovery["activities"].extend(load_exported_activities())
-    if discover_system:
-        discovery["system"] = explore_cf_system()
-
     return discovery
 
 
@@ -116,43 +112,3 @@ def load_exported_activities() -> List[DiscoveredActivities]:
     activities.extend(discover_actions("chaoscf.actions"))
     activities.extend(discover_probes("chaoscf.probes"))
     return activities
-
-
-def explore_cf_system() -> DiscoveredSystemInfo:
-    """
-    Fetch information from the current Cloud Foundry context.
-    """
-    # importing here to avoid circular reference
-    from chaoscf.api import call_api
-
-    logger.info("Discovering Cloud Foundry system")
-    cf_local_config = os.path.expanduser("~/.cf/config.json")
-    if not os.path.exists(cf_local_config):
-        logger.warn(
-            "Could not locate a cloud coundry config file at '{s}'".format(
-                s=cf_local_config))
-        return
-
-    configuration = {}
-    secrets = {}
-    with open(cf_local_config) as f:
-        cf_conf = json.loads(f.read())
-        if "AccessToken" not in cf_conf:
-            logger.warn(
-                "'{s}' is missing an access token, please run `cf login` "
-                "and re-run the discovery command".format(
-                    s=cf_local_config))
-            return
-
-        token_type, token = cf_conf["AccessToken"].split(" ", 1)
-        secrets["cf_token_type"] = token_type
-        secrets["cf_access_token"] = token
-        configuration["cf_verify_ssl"] = not cf_conf["SSLDisabled"]
-        configuration["cf_api_url"] = cf_conf["Target"]
-
-    info = {}
-    info["orgs"] = call_api("/v2/organizations", configuration, secrets).json()
-    info["apps"] = call_api("/v2/apps", configuration, secrets).json()
-    info["routes"] = call_api("/v2/routes", configuration, secrets).json()
-
-    return info
