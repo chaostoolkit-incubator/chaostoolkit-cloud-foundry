@@ -10,7 +10,7 @@ from chaoscf import auth
 
 __all__ = ['call_api', 'get_app_by_name', 'get_org_by_name',
            'get_space_by_name', 'get_app_instances', 'get_app_routes_by_host',
-           'get_routes_by_host']
+           'get_routes_by_host', 'get_bind_by_name']
 
 
 def call_api(path: str, configuration: Configuration,
@@ -225,3 +225,29 @@ def get_app_instances(app_name: str,  configuration: Configuration,
             a=app_name))
 
     return instances
+
+
+def get_bind_by_name(bind_name: str, configuration: Configuration,
+                     secrets: Secrets, space_name: str = None,
+                     space_guid: str = None, org_name: str = None,
+                     org_guid: str = None) -> Dict[str, Any]:
+    """
+    Get the service bind with the given name.
+
+    You may restrict the search by organization and/or space by providing the
+    various according parameters. When passing the names, the function performs
+    a lookup for each of them to fetch their GUID.
+
+    See https://apidocs.cloudfoundry.org/280/apps/list_all_apps.html
+    """
+    q = _get_filter_query(
+        configuration, secrets, space_name, space_guid, org_name, org_guid)
+    q.append("name:{n}".format(n=bind_name))
+
+    binds = call_api(
+        "/v2/service_bindings", configuration, secrets, query={"q": q}).json()
+
+    if not binds['total_results']:
+        raise FailedActivity("bind '{a}' was not found".format(a=bind_name))
+
+    return binds['resources'][0]

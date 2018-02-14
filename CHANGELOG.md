@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.4.0...HEAD
 
+### Changed
+
+-   Add "Unbind from service" action
+
 ## [0.4.0][]
 
 [0.4.0]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.3.1...0.4.0

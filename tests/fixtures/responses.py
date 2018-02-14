@@ -175,3 +175,24 @@ instances = {
         'since': 1515413624
     }
 }
+
+bind = {
+    'metadata': {
+        'guid': 'a8f47fc8-0d26-4acb-a944-6ae45ed27abe',
+        'url': '/v2/service_bindings/a8f47fc8-0d26-4acb-a944-6ae45ed27abe',
+        'created_at': '2018-01-04T14:35:55Z',
+        'updated_at': '2018-01-08T12:15:31Z'
+    },
+    'entity': {
+        'name': 'my-bind',
+        'production': False
+    }
+}
+
+binds = {
+    'total_results': 1,
+    'total_pages': 1,
+    'prev_url': None,
+    'next_url': None,
+    'resources': [bind]
+}
