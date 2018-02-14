@@ -6,10 +6,10 @@ from chaoslib.types import Configuration, Secrets
 from logzero import logger
 
 from chaoscf.api import call_api, get_app_by_name, get_app_routes_by_host, \
-    get_app_instances
+    get_app_instances, get_bind_by_name
 
 __all__ = ["delete_app", "remove_routes_from_app", "terminate_app_instance",
-           "terminate_some_random_instance"]
+           "terminate_some_random_instance", "unbind_service_from_app"]
 
 
 def delete_app(app_name: str, configuration: Configuration, secrets: Secrets,
@@ -89,3 +89,28 @@ def terminate_some_random_instance(app_name: str, configuration: Configuration,
     index = random.choice(indices)
     terminate_app_instance(
         app_name, index, configuration, secrets, org_name, space_name)
+
+
+def unbind_service_from_app(app_name: str, bind_name: str,
+                            configuration: Configuration, secrets: Secrets,
+                            org_name: str = None, space_name: str = None):
+    """
+    Unbind the service from the given application.
+
+    See
+    https://apidocs.cloudfoundry.org/280/service_bindings/delete_a_particular_service_binding.html
+    """  # noqa: E501
+    app = get_app_by_name(
+        app_name, configuration, secrets, org_name=org_name,
+        space_name=space_name)
+
+    service_bind = get_bind_by_name(
+        bind_name, configuration, secrets, org_name=org_name,
+        space_name=space_name)
+
+    logger.debug("Ubinding service {s} from application {a}".format(
+        s=bind_name, a=app_name))
+
+    path = "/v2/service_bindings/{s}".format(
+        s=service_bind["metadata"]["guid"])
+    call_api(path, configuration, secrets, method="DELETE")

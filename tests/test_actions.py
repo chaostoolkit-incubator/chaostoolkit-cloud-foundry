@@ -2,7 +2,7 @@
 from unittest.mock import MagicMock, patch
 
 from chaoscf.actions import delete_app, terminate_app_instance, \
-    terminate_some_random_instance
+    terminate_some_random_instance, unbind_service_from_app
 from chaoslib.exceptions import FailedActivity
 import pytest
 import requests_mock
@@ -75,3 +75,24 @@ def test_terminate_random_app_instance(auth, rand):
 
         terminate_some_random_instance(
             "my-app", config.config, secrets.secrets)
+
+
+@patch('chaoscf.api.auth', autospec=True)
+def test_unbind_service_from_app(auth):
+    auth.return_value = responses.auth_response
+    bind_guid = responses.bind["metadata"]["guid"]
+    with requests_mock.mock() as m:
+        m.get(
+            "https://example.com/v2/apps?q=name:my-app", status_code=200,
+            json=responses.apps, complete_qs=True)
+
+        m.get(
+            "https://example.com/v2/service_bindings?q=name:my-bind",
+            status_code=200, json=responses.binds, complete_qs=True)
+
+        m.delete(
+            "https://example.com/v2/service_bindings/{s}".format(s=bind_guid),
+            status_code=204)
+
+        unbind_service_from_app(
+            "my-app", "my-bind", config.config, secrets.secrets)
