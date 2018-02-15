@@ -8,7 +8,7 @@
 
 -   Add "Unbind from service" action
 -   Add basic examples to un agains a live Cloud Foundry
--   Add "delete and add route" actions
+-   Add "unmap and map route" actions
 
 ## [0.4.0][]
 
