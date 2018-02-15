@@ -79,9 +79,9 @@ def unmap_route_from_app(app_name: str, host_name: str,
     for route in routes["resources"]:
         if route["entity"]["host"] == host_name:
             call_api(
-                "{a}/{r}".format(a=routes_path,
-                r=route["metadata"]["guid"]), configuration, secrets,
-                method="DELETE")
+                "{a}/{r}".format(
+                    a=routes_path, r=route["metadata"]["guid"]),
+                configuration, secrets, method="DELETE")
 
 
 def map_route_to_app(app_name: str, host_name: str,
@@ -113,8 +113,9 @@ def map_route_to_app(app_name: str, host_name: str,
     results = []
     for route in routes_for_host["resources"]:
         results.append(call_api(
-            "{a}/{r}".format(a=routes_path,
-            r=route["metadata"]["guid"]), configuration, secrets,
+            "{a}/{r}".format(
+                a=routes_path, r=route["metadata"]["guid"]),
+            configuration, secrets,
             method="PUT").json())
     return results
 
