@@ -2,7 +2,8 @@
 from unittest.mock import MagicMock, patch
 
 from chaoscf.actions import delete_app, terminate_app_instance, \
-    terminate_some_random_instance, unbind_service_from_app
+    terminate_some_random_instance, unbind_service_from_app, \
+    unmap_route_from_app
 from chaoslib.exceptions import FailedActivity
 import pytest
 import requests_mock
@@ -11,7 +12,7 @@ from fixtures import config, responses, secrets
 
 
 @patch('chaoscf.actions.call_api', autospec=True)
-def test_fail_to_delete_unknwon_app(call_api):
+def test_fail_to_delete_unknown_app(call_api):
     apps = responses.apps.copy()
     apps['resources'] = []
 
@@ -96,3 +97,27 @@ def test_unbind_service_from_app(auth):
 
         unbind_service_from_app(
             "my-app", "my-bind", config.config, secrets.secrets)
+
+
+@patch('chaoscf.api.auth', autospec=True)
+def test_unmap_route_from_app(auth):
+    auth.return_value = responses.auth_response
+    route_guid = responses.route["metadata"]["guid"]
+    app_guid = responses.app["metadata"]["guid"]
+    with requests_mock.mock() as m:
+        m.get(
+            "https://example.com/v2/apps?q=name:my-app", 
+            status_code=200,
+            json=responses.apps, complete_qs=True)
+
+        m.get(
+            "https://example.com/v2/apps/{app}/routes".format(app=app_guid),
+            status_code=200,
+            json=responses.routes, complete_qs=True)
+
+        m.delete(
+            "https://example.com/v2/routes/{s}".format(s=route_guid),
+            status_code=204)
+
+        unmap_route_from_app(
+            "my-app", "whatever", config.config, secrets.secrets)

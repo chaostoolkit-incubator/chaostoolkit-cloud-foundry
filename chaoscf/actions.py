@@ -9,7 +9,8 @@ from chaoscf.api import call_api, get_app_by_name, get_app_routes_by_host, \
     get_app_instances, get_bind_by_name
 
 __all__ = ["delete_app", "remove_routes_from_app", "terminate_app_instance",
-           "terminate_some_random_instance", "unbind_service_from_app"]
+           "terminate_some_random_instance", "unbind_service_from_app",
+           "unmap_route_from_app"]
 
 
 def delete_app(app_name: str, configuration: Configuration, secrets: Secrets,
@@ -31,7 +32,7 @@ def remove_routes_from_app(app_name: str, route_host: str,
                            configuration: Configuration, secrets: Secrets,
                            org_name: str = None, space_name: str = None):
     """
-    Remove a route from an application.
+    Remove routes from a given application.
 
     See
     https://apidocs.cloudfoundry.org/280/apps/remove_route_from_the_app.html
@@ -49,6 +50,36 @@ def remove_routes_from_app(app_name: str, route_host: str,
         route_guid = route["metadata"]["guid"]
         path = "/v2/apps/{a}/routes/{r}".format(a=app_guid, r=route_guid)
         call_api(path, configuration, secrets, method="DELETE")
+
+
+def unmap_route_from_app(app_name: str, host_name: str,
+                         configuration: Configuration, secrets: Secrets,
+                         org_name: str = None, space_name: str = None):
+    """
+    Unmap a specific route from a given application.
+
+    As Domains are deprecated in the Cloud Foundry API, they are not
+    specified here.
+    See
+    https://apidocs.cloudfoundry.org/280/#domains--deprecated-
+    See
+    https://www.cloudfoundry.org/blog/coming-changes-app-manifest-simplification/
+
+    See
+    https://apidocs.cloudfoundry.org/280/apps/remove_route_from_the_app.html
+    """
+    app = get_app_by_name(
+        app_name, configuration, secrets, org_name=org_name,
+        space_name=space_name)
+
+    routes_path = app["entity"]["routes_url"]
+    routes = call_api(routes_path, configuration, secrets).json()
+
+    for route in routes["resources"]:
+        if route["entity"]["host"] == host_name:
+            call_api(
+                route["metadata"]["url"], configuration, secrets,
+                method="DELETE")
 
 
 def terminate_app_instance(app_name: str, instance_index: int,
