@@ -57,7 +57,8 @@ app = {
         'detected_buildpack_guid': '36d282b5-2f32-45b4-a168-574fd126523e',
         'events_url': '/v2/apps/a8f47fc8-0d26-4acb-a944-6ae45ed27abe/events',
         'service_bindings_url': '/v2/apps/a8f47fc8-0d26-4acb-a944-6ae45ed27abe/service_bindings',
-        'route_mappings_url': '/v2/apps/a8f47fc8-0d26-4acb-a944-6ae45ed27abe/route_mappings'
+        'route_mappings_url': '/v2/apps/a8f47fc8-0d26-4acb-a944-6ae45ed27abe/route_mappings',
+        'routes_url': '/v2/apps/a8f47fc8-0d26-4acb-a944-6ae45ed27abe/routes'
     }
 }
 
