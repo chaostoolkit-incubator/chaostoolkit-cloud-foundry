@@ -7,6 +7,7 @@
 ### Changed
 
 -   Add "Unbind from service" action
+-   Add basic examples to un agains a live Cloud Foundry
 
 ## [0.4.0][]
 
