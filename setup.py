@@ -1,14 +1,24 @@
 #!/usr/bin/env python
 """chaostoolkit builder and installer"""
-
+import os
 import sys
 import io
 
 import setuptools
 
-sys.path.insert(0, ".")
-from chaoscf import __version__
-sys.path.remove(".")
+def get_version_from_package() -> str:
+    """
+    Read the package version from the source without importing it.
+    """
+    path = os.path.join(os.path.dirname(__file__), "chaoscf/__init__.py")
+    path = os.path.normpath(os.path.abspath(path))
+    with open(path) as f:
+        for line in f:
+            if line.startswith("__version__"):
+                token, version = line.split(" = ", 1)
+                version = version.replace("'", "").strip()
+                return version
+
 
 name = 'chaostoolkit-cloud-foundry'
 desc = 'Chaos Toolkit Extension for Cloud Foundry'
@@ -50,7 +60,7 @@ with io.open('requirements.txt') as f:
 
 setup_params = dict(
     name=name,
-    version=__version__,
+    version=get_version_from_package(),
     description=desc,
     long_description=long_desc,
     classifiers=classifiers,

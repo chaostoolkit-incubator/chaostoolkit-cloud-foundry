@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.5.1...HEAD
+
+## [0.5.1][]
+
+[0.5.1]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.5.0...0.5.1
+
+### Changed
+
+-   Read version from source code without importing when deps are not available yet
 
 ## [0.5.0][]
 
