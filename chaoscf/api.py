@@ -15,7 +15,7 @@ __all__ = ['call_api', 'get_app_by_name', 'get_org_by_name',
 
 def call_api(path: str, configuration: Configuration,
              secrets: Secrets, query: Dict[str, Any] = None,
-             data: Dict[str, Any] = None, method: str = "GET",
+             body: Dict[str, Any] = None, method: str = "GET",
              headers: Dict[str, str] = None) -> requests.Response:
     """
     Perform a Cloud Foundry API call and return the full response to the
@@ -41,7 +41,7 @@ def call_api(path: str, configuration: Configuration,
     verify_ssl = configuration.get("cf_verify_ssl", True)
     url = "{u}{p}".format(u=configuration["cf_api_url"], p=path)
     r = requests.request(
-        method, url, params=query, data=data, verify=verify_ssl, headers=h)
+        method, url, params=query, json=body, verify=verify_ssl, headers=h)
 
     request_id = r.headers.get("X-VCAP-Request-ID")
     logger.debug("Request ID: {i}".format(i=request_id))
