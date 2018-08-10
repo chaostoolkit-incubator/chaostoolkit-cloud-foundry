@@ -1,6 +1,6 @@
 # Chaos Toolkit Cloud Foundry Extension
 
-[![Build Status](https://travis-ci.org/chaostoolkit/chaostoolkit-cloud-foundry.svg?branch=master)](https://travis-ci.org/chaostoolkit/chaostoolkit-cloud-foundry)
+[![Build Status](https://travis-ci.org/chaostoolkit-incubator/chaostoolkit-cloud-foundry.svg?branch=master)](https://travis-ci.org/chaostoolkit-incubator/chaostoolkit-cloud-foundry)
 
 This extension package provides probes and actions for Chaos Engineering
 experiments against a Cloud Foundry instance using the
