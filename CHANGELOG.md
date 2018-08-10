@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.5.1...HEAD
 
+### Changed
+
+-   Add "Stop CF application" action
+
 ## [0.5.1][]
 
 [0.5.1]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.5.0...0.5.1
