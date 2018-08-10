@@ -1,6 +1,9 @@
 # Chaos Toolkit Cloud Foundry Extension
 
 [![Build Status](https://travis-ci.org/chaostoolkit-incubator/chaostoolkit-cloud-foundry.svg?branch=master)](https://travis-ci.org/chaostoolkit-incubator/chaostoolkit-cloud-foundry)
+[![Python versions](https://img.shields.io/pypi/pyversions/chaostoolkit-cloud-foundry.svg)](https://www.python.org/)
+[![Requirements Status](https://requires.io/github/chaostoolkit-incubator/chaostoolkit-cloud-foundry/requirements.svg?branch=master)](https://requires.io/github/chaostoolkit-incubator/chaostoolkit-cloud-foundry/requirements/?branch=master)
+[![Has wheel](https://img.shields.io/pypi/wheel/chaostoolkit-cloud-foundry.svg)](http://pythonwheels.com/)
 
 This extension package provides probes and actions for Chaos Engineering
 experiments against a Cloud Foundry instance using the
