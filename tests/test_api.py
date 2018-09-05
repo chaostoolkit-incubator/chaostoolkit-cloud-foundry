@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
-from unittest.mock import MagicMock, patch
-from urllib.parse import urlencode
+from unittest.mock import patch, call
 
-from chaoslib.exceptions import FailedActivity
-from chaoscf.api import call_api, get_app_by_name, get_org_by_name, \
-    get_space_by_name, get_routes_by_host, get_app_routes_by_host, \
-    get_app_instances
 import pytest
 import requests_mock
-
+from chaoslib.exceptions import FailedActivity
 from fixtures import config, responses, secrets
 
+import chaoscf
+from chaoscf.api import get_app_by_name, get_org_by_name, \
+    get_space_by_name, get_routes_by_host, get_app_routes_by_host, \
+    get_app_instances, get_apps_for_org
+
+
+def test_all_lists_the_apis_exposed():
+    assert ['call_api', 'get_app_by_name', 'get_app_instances',
+            'get_app_routes_by_host', 'get_apps_for_org', 'get_bind_by_name',
+            'get_org_by_name', 'get_routes_by_host', 'get_space_by_name'] == chaoscf.api.__all__
 
 @patch('chaoscf.api.call_api', autospec=True)
 def test_get_app_by_name_returns_the_app_with_exact_name(call_api):
@@ -177,3 +182,30 @@ def test_get_app_instances(auth):
         instances = get_app_instances(
             "my-app", config.config, secrets.secrets)
         assert len(instances) == 1
+
+
+@patch('chaoscf.api.get_org_by_name', autospec=True, return_value=responses.org)
+@patch('chaoscf.api.call_api', autospec=True)
+def test_get_apps_for_org(call_api, mock_get_org_by_name):
+    call_api.return_value = responses.FakeResponse(status_code=200, text=None, json=lambda: responses.apps)
+    org_name = responses.org['entity']['name']
+    org_guid = responses.org['metadata']['guid']
+
+    result = get_apps_for_org(org_name, config.config, secrets.secrets)
+
+    mock_get_org_by_name.assert_has_calls([call(org_name, config.config, secrets.secrets)])
+    query = {"q": ['organization_guid:' + org_guid]}
+    call_api.assert_has_calls([call("/v2/apps", config.config, secrets.secrets, query=query)])
+    assert result == responses.apps
+
+
+@patch('chaoscf.api.get_org_by_name', autospec=True, return_value=responses.org)
+@patch('chaoscf.api.call_api', autospec=True)
+def test_get_apps_for_org_should_raise_a_failed_activity_exception_when_no_apps_found(call_api, mock_get_org_by_name):
+    call_api.return_value = responses.FakeResponse(status_code=200, text=None, json=lambda: {'total_results': 0})
+    org_name = responses.org['entity']['name']
+
+    with pytest.raises(FailedActivity) as exception:
+        get_apps_for_org(org_name, config.config, secrets.secrets)
+
+    assert "apps for organization name {o} not found".format(o=org_name) in str(exception)

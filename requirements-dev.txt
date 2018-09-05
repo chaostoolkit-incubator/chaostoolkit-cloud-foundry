@@ -4,3 +4,4 @@ pytest>=2.8
 pytest-cov
 pytest-sugar
 requests_mock
+pytest_runner>=4.2

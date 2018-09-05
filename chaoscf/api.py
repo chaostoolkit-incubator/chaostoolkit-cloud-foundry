@@ -8,9 +8,9 @@ import requests
 
 from chaoscf import auth
 
-__all__ = ['call_api', 'get_app_by_name', 'get_org_by_name',
-           'get_space_by_name', 'get_app_instances', 'get_app_routes_by_host',
-           'get_routes_by_host', 'get_bind_by_name']
+__all__ = ['call_api', 'get_app_by_name', 'get_app_instances',
+           'get_app_routes_by_host', 'get_apps_for_org', 'get_bind_by_name',
+           'get_org_by_name', 'get_routes_by_host', 'get_space_by_name']
 
 
 def call_api(path: str, configuration: Configuration,
@@ -251,3 +251,21 @@ def get_bind_by_name(bind_name: str, configuration: Configuration,
         raise FailedActivity("bind '{a}' was not found".format(a=bind_name))
 
     return binds['resources'][0]
+
+
+def get_apps_for_org(org_name: str, configuration: Configuration,
+                     secrets: Secrets):
+    """
+    List all applications available in the specified CF org name.
+
+    See https://apidocs.cloudfoundry.org/280/apps/list_all_apps.html to
+    understand the content of the response.
+    """
+    q = _get_filter_query(configuration, secrets, org_name=org_name)
+
+    apps = call_api("/v2/apps", configuration, secrets, query={"q": q}).json()
+    if not apps['total_results']:
+        raise FailedActivity(
+            "apps for organization name {o} not found".format(o=org_name))
+
+    return apps
