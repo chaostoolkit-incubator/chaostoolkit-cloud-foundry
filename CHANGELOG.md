@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.6.0...HEAD
 
+### Added
+
+ -   Add "Stop All CF applications for the specified org name" action
+
 ## [0.6.0][]
 
 [0.6.0]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.5.1...0.6.0
