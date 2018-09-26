@@ -7,6 +7,7 @@
 ### Added
 
  -   Add "Stop All CF applications for the specified org name" action
+ -   Add "Start a CF application" action
 
 ## [0.6.0][]
 

@@ -9,7 +9,7 @@ from chaoscf.api import call_api, get_app_by_name, get_app_routes_by_host, \
     get_app_instances, get_bind_by_name, get_routes_by_host, get_apps_for_org
 
 __all__ = ['delete_app', 'map_route_to_app', 'remove_routes_from_app',
-           'stop_all_apps', 'stop_app', 'terminate_app_instance',
+           'start_app', 'stop_all_apps', 'stop_app', 'terminate_app_instance',
            'terminate_some_random_instance', 'unbind_service_from_app',
            'unmap_route_from_app']
 
@@ -27,6 +27,22 @@ def delete_app(app_name: str, configuration: Configuration, secrets: Secrets,
 
     path = "/v2/apps/{a}".format(a=app['metadata']['guid'])
     call_api(path, configuration, secrets, method="DELETE")
+
+
+def start_app(app_name: str, configuration: Configuration, secrets: Secrets,
+              org_name: str = None, space_name: str = None):
+    """
+    Start application
+
+    See https://apidocs.cloudfoundry.org/280/apps/updating_an_app.html
+    """
+    app = get_app_by_name(
+        app_name, configuration, secrets, org_name=org_name,
+        space_name=space_name)
+
+    path = "/v2/apps/{a}".format(a=app['metadata']['guid'])
+    call_api(
+        path, configuration, secrets, method="PUT", body={"state": "STARTED"})
 
 
 def stop_app(app_name: str, configuration: Configuration, secrets: Secrets,
