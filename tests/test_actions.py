@@ -8,16 +8,16 @@ from fixtures import config, responses, secrets
 
 import chaoscf
 from chaoscf.actions import delete_app, map_route_to_app, \
-    start_app, stop_all_apps, stop_app, terminate_app_instance, \
-    terminate_some_random_instance, unbind_service_from_app, \
-    unmap_route_from_app
+    start_all_apps, start_app, stop_all_apps, stop_app, \
+    terminate_app_instance, terminate_some_random_instance, \
+    unbind_service_from_app, unmap_route_from_app
 
 
 def test_all_lists_the_actions_exposed():
     assert ['delete_app', 'map_route_to_app', 'remove_routes_from_app',
-            'start_app', 'stop_all_apps', 'stop_app', 'terminate_app_instance',
-            'terminate_some_random_instance', 'unbind_service_from_app',
-            'unmap_route_from_app'] == chaoscf.actions.__all__
+            'start_all_apps', 'start_app', 'stop_all_apps', 'stop_app',
+            'terminate_app_instance', 'terminate_some_random_instance',
+            'unbind_service_from_app', 'unmap_route_from_app'] == chaoscf.actions.__all__
 
 
 @patch('chaoscf.actions.get_app_by_name', autospec=True)
@@ -173,6 +173,19 @@ def test_stop_app(auth, get_app_by_name):
         stop_app("my-app", config.config, secrets.secrets)
 
     assert mock.call_count == 1
+
+
+@patch('chaoscf.actions.start_app', autospec=True)
+@patch('chaoscf.actions.get_apps_for_org', autospec=True, return_value=responses.apps)
+def test_start_all_apps(get_apps_for_org, start_app):
+    org_name = "CF_ORG_NAME"
+    start_all_apps(org_name, config.config, secrets.secrets)
+
+    get_apps_for_org.assert_has_calls([call(org_name, config.config, secrets.secrets)])
+    start_app.assert_has_calls([
+        call(app['entity']['name'], config.config, secrets.secrets, org_name=org_name) for app in
+        responses.apps['resources']
+    ])
 
 
 @patch('chaoscf.actions.stop_app', autospec=True)

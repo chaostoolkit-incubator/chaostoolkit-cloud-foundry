@@ -9,9 +9,9 @@ from chaoscf.api import call_api, get_app_by_name, get_app_routes_by_host, \
     get_app_instances, get_bind_by_name, get_routes_by_host, get_apps_for_org
 
 __all__ = ['delete_app', 'map_route_to_app', 'remove_routes_from_app',
-           'start_app', 'stop_all_apps', 'stop_app', 'terminate_app_instance',
-           'terminate_some_random_instance', 'unbind_service_from_app',
-           'unmap_route_from_app']
+           'start_all_apps', 'start_app', 'stop_all_apps', 'stop_app',
+           'terminate_app_instance', 'terminate_some_random_instance',
+           'unbind_service_from_app', 'unmap_route_from_app']
 
 
 def delete_app(app_name: str, configuration: Configuration, secrets: Secrets,
@@ -59,6 +59,19 @@ def stop_app(app_name: str, configuration: Configuration, secrets: Secrets,
     path = "/v2/apps/{a}".format(a=app['metadata']['guid'])
     call_api(
         path, configuration, secrets, method="PUT", body={"state": "STOPPED"})
+
+
+def start_all_apps(org_name: str, configuration: Configuration,
+                   secrets: Secrets):
+    """
+    Start all applications for the specified org name
+
+    See https://apidocs.cloudfoundry.org/280/apps/updating_an_app.html
+    """
+    apps = get_apps_for_org(org_name, configuration, secrets)
+    for app in apps['resources']:
+        start_app(app['entity']['name'], configuration, secrets,
+                  org_name=org_name)
 
 
 def stop_all_apps(org_name: str, configuration: Configuration,
