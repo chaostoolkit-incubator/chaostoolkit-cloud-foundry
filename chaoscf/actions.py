@@ -228,13 +228,9 @@ def unbind_service_from_app(app_name: str, bind_name: str,
     See
     https://apidocs.cloudfoundry.org/280/service_bindings/delete_a_particular_service_binding.html
     """  # noqa: E501
-    app = get_app_by_name(
-        app_name, configuration, secrets, org_name=org_name,
-        space_name=space_name)
-
     service_bind = get_bind_by_name(
-        bind_name, configuration, secrets, org_name=org_name,
-        space_name=space_name)
+        bind_name, configuration, secrets,
+        app_name=app_name, space_name=space_name, org_name=org_name)
 
     logger.debug("Ubinding service {s} from application {a}".format(
         s=bind_name, a=app_name))

@@ -203,7 +203,7 @@ def get_app_routes_by_host(app_name: str, route_host: str,
     return result
 
 
-def get_app_instances(app_name: str,  configuration: Configuration,
+def get_app_instances(app_name: str, configuration: Configuration,
                       secrets: Secrets, space_name: str = None,
                       space_guid: str = None, org_name: str = None,
                       org_guid: str = None) -> Dict[str, Dict[str, Any]]:
@@ -228,8 +228,9 @@ def get_app_instances(app_name: str,  configuration: Configuration,
 
 
 def get_bind_by_name(bind_name: str, configuration: Configuration,
-                     secrets: Secrets, space_name: str = None,
-                     space_guid: str = None, org_name: str = None,
+                     secrets: Secrets, app_name: str = None,
+                     space_name: str = None, space_guid: str = None,
+                     org_name: str = None,
                      org_guid: str = None) -> Dict[str, Any]:
     """
     Get the service bind with the given name.
@@ -240,17 +241,24 @@ def get_bind_by_name(bind_name: str, configuration: Configuration,
 
     See https://apidocs.cloudfoundry.org/280/apps/list_all_apps.html
     """
-    q = _get_filter_query(
-        configuration, secrets, space_name, space_guid, org_name, org_guid)
-    q.append("name:{n}".format(n=bind_name))
+    app = get_app_by_name(
+        app_name, configuration, secrets, org_name=org_name,
+        space_name=space_name)
 
     binds = call_api(
-        "/v2/service_bindings", configuration, secrets, query={"q": q}).json()
+        "/v2/apps/" + app["metadata"]["guid"] + "/service_bindings",
+        configuration, secrets).json()
 
     if not binds['total_results']:
         raise FailedActivity("bind '{a}' was not found".format(a=bind_name))
 
-    return binds['resources'][0]
+    service_binding = next(item for item in binds["resources"]
+                           if item["entity"]["name"] == bind_name)
+
+    if not service_binding:
+        raise FailedActivity("bind '{a}' was not found".format(a=bind_name))
+
+    return service_binding
 
 
 def get_apps_for_org(org_name: str, configuration: Configuration,
