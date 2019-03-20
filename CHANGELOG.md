@@ -2,7 +2,11 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.7.1...HEAD
+
+## [0.7.1][]
+
+[0.7.1]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.7.0...0.7.1
 
 ### Changed
 
