@@ -9,13 +9,14 @@ from fixtures import config, responses, secrets
 import chaoscf
 from chaoscf.api import get_app_by_name, get_org_by_name, \
     get_space_by_name, get_routes_by_host, get_app_routes_by_host, \
-    get_app_instances, get_apps_for_org
+    get_app_instances, get_apps_for_org, get_bind_by_name
 
 
 def test_all_lists_the_apis_exposed():
     assert ['call_api', 'get_app_by_name', 'get_app_instances',
             'get_app_routes_by_host', 'get_apps_for_org', 'get_bind_by_name',
             'get_org_by_name', 'get_routes_by_host', 'get_space_by_name'] == chaoscf.api.__all__
+
 
 @patch('chaoscf.api.call_api', autospec=True)
 def test_get_app_by_name_returns_the_app_with_exact_name(call_api):
@@ -182,6 +183,75 @@ def test_get_app_instances(auth):
         instances = get_app_instances(
             "my-app", config.config, secrets.secrets)
         assert len(instances) == 1
+
+
+@patch('chaoscf.api.get_app_by_name', autospec=True, return_value=responses.app)
+@patch('chaoscf.api.auth', autospec=True)
+def test_get_bind_by_name(auth, mock_get_app_by_name):
+    auth.return_value = responses.auth_response
+    with requests_mock.mock() as m:
+        m.get(
+            "https://example.com/v2/apps/" + responses.app["metadata"]["guid"] + "/service_bindings",
+            status_code=200, json=responses.binds, complete_qs=True)
+
+        get_bind_by_name("my-bind", config.config, secrets.secrets, app_name="my-app", org_name="my-org")
+
+    mock_get_app_by_name.assert_has_calls([call("my-app", config.config,
+                                                secrets.secrets, org_name="my-org", space_name=None)])
+
+
+@patch('chaoscf.api.get_app_by_name', autospec=True, side_effect=FailedActivity("error"))
+@patch('chaoscf.api.auth', autospec=True)
+def test_get_bind_by_name_when_app_not_found(auth, mock_get_app_by_name):
+    auth.return_value = responses.auth_response
+    with requests_mock.mock() as m:
+        m.get(
+            "https://example.com/v2/apps/" + responses.app["metadata"]["guid"] + "/service_bindings",
+            status_code=200, json=responses.binds, complete_qs=True)
+
+        with pytest.raises(FailedActivity):
+            get_bind_by_name("my-bind", config.config, secrets.secrets, app_name="my-app", org_name="my-org")
+
+    mock_get_app_by_name.assert_has_calls([call("my-app", config.config,
+                                                secrets.secrets, org_name="my-org", space_name=None)])
+
+
+@patch('chaoscf.api.get_app_by_name', autospec=True, side_effect=FailedActivity("error"))
+@patch('chaoscf.api.auth', autospec=True)
+def test_get_bind_by_name_when_app_has_no_bindings(auth, mock_get_app_by_name):
+    auth.return_value = responses.auth_response
+    with requests_mock.mock() as m:
+        m.get(
+            "https://example.com/v2/apps/" + responses.app["metadata"]["guid"] + "/service_bindings",
+            status_code=200, json={
+                'total_results': 0,
+                'total_pages': 0,
+                'prev_url': None,
+                'next_url': None,
+                'resources': []
+            }, complete_qs=True)
+
+        with pytest.raises(FailedActivity):
+            get_bind_by_name("my-bind", config.config, secrets.secrets, app_name="my-app", org_name="my-org")
+
+    mock_get_app_by_name.assert_has_calls([call("my-app", config.config,
+                                                secrets.secrets, org_name="my-org", space_name=None)])
+
+
+@patch('chaoscf.api.get_app_by_name', autospec=True, side_effect=FailedActivity("error"))
+@patch('chaoscf.api.auth', autospec=True)
+def test_get_bind_by_name_when_app_has_no_binding_with_the_specified_name(auth, mock_get_app_by_name):
+    auth.return_value = responses.auth_response
+    with requests_mock.mock() as m:
+        m.get(
+            "https://example.com/v2/apps/" + responses.app["metadata"]["guid"] + "/service_bindings",
+            status_code=200, json=responses.binds, complete_qs=True)
+
+        with pytest.raises(FailedActivity):
+            get_bind_by_name("my-bind-non-existent", config.config, secrets.secrets, app_name="my-app", org_name="my-org")
+
+    mock_get_app_by_name.assert_has_calls([call("my-app", config.config,
+                                                secrets.secrets, org_name="my-org", space_name=None)])
 
 
 @patch('chaoscf.api.get_org_by_name', autospec=True, return_value=responses.org)

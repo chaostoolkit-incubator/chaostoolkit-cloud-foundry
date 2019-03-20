@@ -99,7 +99,7 @@ def test_unbind_service_from_app(auth):
             json=responses.apps, complete_qs=True)
 
         m.get(
-            "https://example.com/v2/service_bindings?q=name:my-bind",
+            "https://example.com/v2/apps/" + responses.app["metadata"]["guid"] + "/service_bindings",
             status_code=200, json=responses.binds, complete_qs=True)
 
         m.delete(

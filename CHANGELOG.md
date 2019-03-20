@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.7.0...HEAD
 
+### Changed
+
+ - Fixed "get_bind_by_name" to use the CF API specs
+
 ## [0.7.0][]
 
 [0.7.0]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.6.0...0.7.0
