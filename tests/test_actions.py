@@ -89,6 +89,39 @@ def test_terminate_random_app_instance(auth, rand):
             "my-app", config.config, secrets.secrets)
 
 
+@patch('chaoscf.actions.random', autospec=True)
+@patch('chaoscf.api.auth', autospec=True)
+def test_terminate_multiple_random_apps_instance(auth, rand):
+    instances = responses.instances.copy()
+    instances["1"] = instances["0"].copy()
+    instances["2"] = instances["0"].copy()
+
+    auth.return_value = responses.auth_response
+    rand.choice.side_effect = ["1", "2"]
+
+    app_guid = responses.app["metadata"]["guid"]
+
+    with requests_mock.mock() as m:
+        m.get(
+            "https://example.com/v2/apps?q=name:my-app", status_code=200,
+            json=responses.apps, complete_qs=True)
+
+        m.get(
+            "https://example.com/v2/apps/{a}/instances".format(a=app_guid),
+            status_code=200, json=instances, complete_qs=True)
+
+        m.delete(
+            "https://example.com/v2/apps/{a}/instances/1".format(a=app_guid),
+            status_code=204)
+
+        m.delete(
+            "https://example.com/v2/apps/{a}/instances/2".format(a=app_guid),
+            status_code=204)
+
+        terminate_some_random_instance(
+            "my-app", config.config, secrets.secrets, qty=2)
+
+
 @patch('chaoscf.api.auth', autospec=True)
 def test_unbind_service_from_app(auth):
     auth.return_value = responses.auth_response
