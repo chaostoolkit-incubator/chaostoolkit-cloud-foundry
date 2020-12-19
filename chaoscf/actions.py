@@ -202,7 +202,7 @@ def terminate_app_instance(app_name: str, instance_index: int,
 
 def terminate_some_random_instance(app_name: str, configuration: Configuration,
                                    secrets: Secrets, org_name: str = None,
-                                   space_name: str = None):
+                                   space_name: str = None, qty: int = 1):
     """
     Terminate a random application's instance.
 
@@ -214,9 +214,11 @@ def terminate_some_random_instance(app_name: str, configuration: Configuration,
         space_name=space_name)
 
     indices = [idx for idx in instances.keys()]
-    index = random.choice(indices)
-    terminate_app_instance(
-        app_name, index, configuration, secrets, org_name, space_name)
+    for i in range(qty):
+        index = random.choice(indices)
+        terminate_app_instance(
+            app_name, index, configuration, secrets, org_name, space_name)
+        indices.remove(index)
 
 
 def unbind_service_from_app(app_name: str, bind_name: str,
