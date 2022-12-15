@@ -11,6 +11,7 @@ from chaoscf.api import call_api, get_app_by_name, get_app_routes_by_host, \
 __all__ = ['delete_app', 'map_route_to_app', 'remove_routes_from_app',
            'start_all_apps', 'start_app', 'stop_all_apps', 'stop_app',
            'terminate_app_instance', 'terminate_some_random_instance',
+		   'stop_random_app',
            'unbind_service_from_app', 'unmap_route_from_app']
 
 
@@ -217,6 +218,18 @@ def terminate_some_random_instance(app_name: str, configuration: Configuration,
     index = random.choice(indices)
     terminate_app_instance(
         app_name, index, configuration, secrets, org_name, space_name)
+		
+
+def stop_random_app(configuration: Configuration,
+                                   secrets: Secrets, org_name: str = None,
+                                   space_name: str = None):
+    """
+    Terminate a random application.
+    """ 
+	apps = get_apps_for_org(org_name, configuration, secrets) 
+   
+    random_app = random.choice(apps)
+	stop_app(random_app, configuration, secrets, org_name, space_name)
 
 
 def unbind_service_from_app(app_name: str, bind_name: str,
