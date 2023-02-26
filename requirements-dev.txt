@@ -5,3 +5,7 @@ pytest-cov
 pytest-sugar
 requests_mock
 pytest_runner>=4.2
+flake8
+black
+isort
+pyflakes==2.4.0
