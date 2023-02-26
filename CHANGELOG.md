@@ -2,7 +2,17 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.7.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.7.2...HEAD
+
+## [0.7.2][]
+
+[0.7.2]: https://github.com/chaostoolkit/chaostoolkit-cloud-foundry/compare/0.7.1...0.7.2
+
+### Changed
+
+ - Modernize to use github action
+ - Fixed python minimal version pattern
+ - Requires now Python 3.7 as other packages
 
 ## [0.7.1][]
 

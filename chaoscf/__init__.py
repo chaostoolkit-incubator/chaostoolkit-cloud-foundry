@@ -18,7 +18,7 @@ import urllib3
 
 urllib3.disable_warnings()
 
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 __all__ = ["__version__", "auth", "discover"]
 
 
