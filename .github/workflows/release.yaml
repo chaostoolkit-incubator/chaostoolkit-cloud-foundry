@@ -18,13 +18,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade setuptools wheel twine
+        pip install --upgrade setuptools wheel twine build
     - name: Build and publish
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_PWD }}
       run: |
-        python3 setup.py release
+        python3 -m build
         twine upload dist/*
     - name: Upload packages as artifacts
       uses: actions/upload-artifact@v2-preview
