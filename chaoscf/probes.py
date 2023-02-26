@@ -8,8 +8,7 @@ from chaoscf.api import call_api, get_app_by_name
 __all__ = ["get_app_stats", "list_apps"]
 
 
-def list_apps(configuration: Configuration,
-              secrets: Secrets) -> Dict[str, Any]:
+def list_apps(configuration: Configuration, secrets: Secrets) -> Dict[str, Any]:
     """
     List all applications available to the authorized user.
 
@@ -19,9 +18,13 @@ def list_apps(configuration: Configuration,
     return call_api("/v2/apps", configuration, secrets).json()
 
 
-def get_app_stats(app_name: str, configuration: Configuration,
-                  secrets: Secrets, org_name: str = None,
-                  space_name: str = None) -> Dict[str, Any]:
+def get_app_stats(
+    app_name: str,
+    configuration: Configuration,
+    secrets: Secrets,
+    org_name: str = None,
+    space_name: str = None,
+) -> Dict[str, Any]:
     """
     Fetch the metrics of the given application.
 
@@ -29,17 +32,21 @@ def get_app_stats(app_name: str, configuration: Configuration,
     for more information.
     """  # noqa: E501
     app = get_app_by_name(
-        app_name, configuration, secrets, org_name=org_name,
-        space_name=space_name)
+        app_name, configuration, secrets, org_name=org_name, space_name=space_name
+    )
 
     return call_api(
-        "/v2/apps/{a}/stats".format(a=app["metadata"]["guid"]),
-        configuration, secrets).json()
+        "/v2/apps/{a}/stats".format(a=app["metadata"]["guid"]), configuration, secrets
+    ).json()
 
 
-def get_app_summary(app_name: str, configuration: Configuration,
-                    secrets: Secrets, org_name: str = None,
-                    space_name: str = None) -> Dict[str, Any]:
+def get_app_summary(
+    app_name: str,
+    configuration: Configuration,
+    secrets: Secrets,
+    org_name: str = None,
+    space_name: str = None,
+) -> Dict[str, Any]:
     """
     Fetch the application summary.
 
@@ -47,9 +54,9 @@ def get_app_summary(app_name: str, configuration: Configuration,
     for more information.
     """
     app = get_app_by_name(
-        app_name, configuration, secrets, org_name=org_name,
-        space_name=space_name)
+        app_name, configuration, secrets, org_name=org_name, space_name=space_name
+    )
 
     return call_api(
-        "/v2/apps/{a}/summary".format(a=app["metadata"]["guid"]),
-        configuration, secrets).json()
+        "/v2/apps/{a}/summary".format(a=app["metadata"]["guid"]), configuration, secrets
+    ).json()
