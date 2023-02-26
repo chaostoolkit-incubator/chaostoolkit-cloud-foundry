@@ -11,7 +11,7 @@ experiments against a Cloud Foundry instance using the
 
 ## Install
 
-This package requires Python 3.5+
+This package requires Python 3.7+
 
 To be used from your experiment, this package must be installed in the Python
 environment where [chaostoolkit][] already lives.
