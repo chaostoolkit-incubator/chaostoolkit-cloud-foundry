@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v2-preview
       with:
         name: chaostoolkit-cloud-foundry-packages
-        path: dist/chaostoolkit_cloud-foundry-*
+        path: dist/chaostoolkit*
 
   create-gh-release:
     runs-on: ubuntu-latest
