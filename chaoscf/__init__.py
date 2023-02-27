@@ -20,7 +20,7 @@ from requests_oauthlib import OAuth2Session
 
 urllib3.disable_warnings()
 
-__version__ = "0.7.2"
+__version__ = "0.7.3"
 __all__ = ["__version__", "auth", "discover"]
 
 
